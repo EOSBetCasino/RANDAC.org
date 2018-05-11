@@ -105,9 +105,9 @@ If we set the `block_reward` to 12.5 and the `uncle_reward` to 0, we are simulat
 ```
 Hash Power on Bitcoin network     |      Minimum Bet for Profitable Cheat
 -------------------------------------------------------------------------
-							20%   |								11.5 BTC
-							10%	  |								13.0 BTC
-							5%    |								15.0 BTC
+                            20%   |	                            11.5 BTC
+                            10%	  |	                            13.0 BTC
+                            5%    |	                            15.0 BTC
 -------------------------------------------------------------------------
 ```
 
@@ -116,9 +116,9 @@ If we set the `block_reward` to 3 and the `uncle_reward` to 2.625, we are simula
 ```
 Hash Power on Ethereum network    |      Minimum Bet for Profitable Cheat
 -------------------------------------------------------------------------
-							20%   |								0.35 ETH
-							10%	  |								0.43 ETH
-							5%    |								0.60 ETH
+                            20%   |	                            0.35 ETH
+                            10%	  |	                            0.43 ETH
+                            5%    |	                            0.60 ETH
 -------------------------------------------------------------------------
 ```
 
@@ -128,7 +128,7 @@ Also note that this sort of randomness generation protocol requires a **mined** 
 
 This randomness generation strategy is much more fallible on the Ethereum network, because of the introduction of uncle rewards. By rewarding blocks submitted late, this cheating miner can still get a partial reward for his withheld block. On the Bitcoin network, the miner must orphan the block if he choses to withhold it (and doesn’t mine another valid block in time).
 
-This randomness generation strategy would work well, if one were to anchor it to blocks produced on the Bitcoin network. A casino could cap bets at around 10 BTC (~$100,000 at todays rate), and be confident that this form of decentralized randomness generation is safe against miner cheating (assuming miners are rational actors, as we should). However, on the Ethereum network, we would be forced to cap bets as a very small amount (~$200 at todays rate), and this would be an unsatisfactory experience for many bettors.
+This randomness generation strategy would work well, if one were to anchor it to blocks produced on the Bitcoin network. A casino could cap bets at around 10 BTC (\~ $100,000 at todays rate), and be confident that this form of decentralized randomness generation is safe against miner cheating (assuming miners are rational actors, as we should). However, on the Ethereum network, we would be forced to cap bets as a very small amount (\~ $200 at todays rate), and this would be an unsatisfactory experience for many bettors.
 
 There is another downside to basing randomness on a future Bitcoin blockhash. Bitcoin blocks, on average, take 10 minutes to produce, so bets at your casino would take 10 minutes (on average) to resolve. This would be an awful user experience, and you can forget about playing interactive games (needing multiple random numbers) like blackjack. However, running a form of decentralized lottery, where tickets are purchased over a period of time, and the lottery resolves on a (much later) future blockhash, is quite viable with a Bitcoin blockhash based randomness strategy.
 
@@ -371,7 +371,9 @@ We can reduce this to one transaction, per contributor, per round as follows: Re
 `H^r(E) = C`
 
 *`H^r` = a function where the argument is Hashed r times*
+
 *`E` = entropy generated*
+
 *`C` = initial commitment*
 
 For the initial commitment, users commit `C`. On the first reveal phase, they submit `H^r-1(E)` as their pre-image. This pre-image is then used as a commitment for the next period. For an arbitrary reveal phase `n`, given that `n < r` the user submits `H^r-n(E)`, or `E where n = r`.
@@ -383,7 +385,9 @@ For an off-chain protocol, we first network all contributors through some sort o
 `SigP(r, i)`
 
 *`SigP` = a signature by contributors public key, P*
+
 *`r` = round number*
+
 *`i` = pre-image*
 
 These signatures are then posted as a transaction to the blockchain, and the pre-images are hashed together as before. Since we require a contributor sign their pre-image, and a round number (used as a nonce) if a user signs the wrong pre-image, it is simple to detect, as before. 
