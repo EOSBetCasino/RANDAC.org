@@ -179,8 +179,11 @@ At the end of a contributors staking period, our DAC smart contract will assess 
 We assume that the consumption of decentralized random numbers will be high on the EOS.IO blockchain, and our RNGaaS will be quite lucrative for our participants.
 
 *By purchasing RNG tokens, downloading our client software, and contributing to our protocol, you are doing the following:*
+
 1. You are getting paid for your services in EOS.
+
 2. You are an integral part of the EOS.IO blockchain, because decentralized apps NEED a decentralized source of random number generation.
+
 3. You are a member of one of the very first Decentralized Autonomous Corporations.
 
 ### Decentralized Random Number Generation - Under the Hood
@@ -193,25 +196,25 @@ Users then generate 32 bytes of random entropy on their client nodes, and submit
 
 *Assemble:*
 
-```[commitment A, commitment B, … commitment X]```
+`[commitment A, commitment B, … commitment X]`
 
 Users then reveal the pre-image to their hash, which is verified to hash correctly against the commitment. After all users have revealed their pre-image, these pre-images are hashed together. This output is our random number!
 
 *Assemble:*
 
-```[pre-image A, pre-image B, … pre-image X]```
+`[pre-image A, pre-image B, … pre-image X]`
 
 *Return __Rand__:*
 
-```Rand = Hash(pre-image A, pre-image B, … pre-image X)```
+`Rand = Hash(pre-image A, pre-image B, … pre-image X)`
 
 Note, that depending on how we calculate this hash, the ordering of the list does, or does not matter. If we use an order independent operator, like + or \*, then the order of the pre-images do not matter.
 
-```Hash(pre-image A * pre-image B) == Hash(pre-image B * pre-image A)```
+`Hash(pre-image A * pre-image B) == Hash(pre-image B * pre-image A)`
 
 *Using an operator where the ordering matters (ex: __.append()__) will change the hashes.*
 
-```Hash(pre-image A.append(pre-image B)) != Hash(pre-image B.append(pre-image A))```
+`Hash(pre-image A.append(pre-image B)) != Hash(pre-image B.append(pre-image A))`
 
 These have tradeoffs which we will explore in the next section, namely speed versus security. Requiring the pre-images to be ordered reduces the effectiveness of a “last pre-image withholding attack”, because only one member may withhold their pre-image & perform this attack each round. Using an order independent operator allows greater speed (users do not have to reveal their pre-images in a strict order). However, a malicious user has a chance, each round, to perform a pre-image withholding attack.
 
@@ -253,19 +256,19 @@ Say that all users except the last user have revealed their pre-images, and they
 
 *Hash of all users except the last user:*
 
-```0xbb42a430a98a3c58a52e987562e0a49114f58e4adf93bfa8d97385dceb34a58a```
+`0xbb42a430a98a3c58a52e987562e0a49114f58e4adf93bfa8d97385dceb34a58a`
 
 Before the last user has revealed his pre-image (and necessarily changed the above hash), he notes that this hash causes him to **win** his hand of blackjack. He then calculates the output of the RNG protocol, and finds that:
 
 *Hash of all users, and output of the RNG protocol:*
 
-```0x6eb4cdfd417ecef262fd9f60ccd27d7d64c5bf2ff7ccd63ac8f36e960f94a97d```
+`0x6eb4cdfd417ecef262fd9f60ccd27d7d64c5bf2ff7ccd63ac8f36e960f94a97d`
 
 This final user necessarily knows that hash, and the output of the RNG protocol, before anyone else. This is because the user is still holding his pre-image private, but since he reveals his pre-image last, he knows the pre-image of all other users, and can determine this hash by himself. Also, note that the user will lose his hand of blackjack if he reveals his pre-image to the smart contract (and the smart contract / RNG protocol outputs the above hash).
 
 Therefore, the user choses to **withhold the pre-image**. In a naive system, the smart contract may chose to disregard this, and output the first hash:
 
-```0xbb42a430a98a3c58a52e987562e0a49114f58e4adf93bfa8d97385dceb34a58a```
+`0xbb42a430a98a3c58a52e987562e0a49114f58e4adf93bfa8d97385dceb34a58a`
 
 In this case, the attacking user has successfully performed an attack, and won a hand of blackjack that the user should have instead lost (if he did not perform this attack).
 
@@ -273,7 +276,7 @@ If the protocol instead discards this randomness generation and bases the result
 
 If we discard any result where an attacker did not reveal their pre-image, an attacker has a 50% chance of winning the next bet, with the punishment of losing the security deposit. However, if we do not discard the randomness, and use the output from the first randomness generation round, then we can assume that the attacker has a 100% chance of winning the next bet (while losing the security deposit, of course).
 
-The RANDAO protocol solved this as follows: given a bet size of ```B```, any and every randomness provider must post a deposit of ```B``` to be able to securely participate in the randomness generation round, to have a secure protocol (that disincentivizes the pre-image withholding attack). Posting a deposit ```< B``` would allow a randomness provider to cheat profitably. If a pre-image is withheld, the perpetrator will lose their entire stake, and the randomness generation process will repeat.
+The RANDAO protocol solved this as follows: given a bet size of `B`, any and every randomness provider must post a deposit of `B` to be able to securely participate in the randomness generation round, to have a secure protocol (that disincentivizes the pre-image withholding attack). Posting a deposit `< B` would allow a randomness provider to cheat profitably. If a pre-image is withheld, the perpetrator will lose their entire stake, and the randomness generation process will repeat.
 
 However, a problem with RANDAO is that contributors have small incentive to actually contribute. Sure, there is a clear disincentive to cheat, shown by stake slashing if a user does not reveal their pre-image in a timely manner. However, asking users to risk a relatively large sum of money to be rewarded in pennies is a tall task. Note that a highly trafficked randomness producer on the Ethereum chain, [oraclize.it](https://oraclize.it), charges $0.05 for a securely generated random number (and attached proof that this number securely generated). Say that 50 members are participating in this randomness generation protocol, that means that they will each profit $0.001 for their participation. While we can theorize that decentralized apps might pay slightly more for an (even more secure) decentrally generated random number, it’s doubtful that they would pay significantly more than $0.05 per number generated.
 
@@ -290,6 +293,7 @@ The basics on the original RANDAO protocol were sound, and the protocol is capab
 *The two main issues with RANDAO are:*
 
 1. Large punishment for accidental disconnections & computer failures (since there is not determinable difference between an accidental disconnect vs. a malicious pre-image withholding attack)
+
 2. Small reward for participation
 
 Individuals will be reluctant to contribute to RANDAC if there is a possibility of losing their initial deposit. To combat this, we propose a series of master nodes. Nodes contributing randomness to a $100 bet need to post $100 in some form of collateral. Instead of requiring nodes to post exactly $100 in collateral (and possibly lose it), we will require master nodes to hold a large amount of RNG, corresponding to $100 of future profits within a defined time. As a simplistic example, if there are 100 master nodes, and our casino is returning $100,000 in profit per quarter to the master nodes, each master node will receive $1,000 of profit per quarter for their participation. Bad behavior will result in this amount of profit decreasing. If a node drops connection during a $100 bet (synonymous with a pre-image withholding attack), then $100 of profit will be withheld from this master node at the end of the quarter. 
@@ -325,15 +329,21 @@ Almost by definition, random numbers in a casino have different “values” att
 We can now outline a system of “master-nodes”. Individuals with larger holdings of RNG can supply more secure randomness, and will partake in greater profits. The more RNG an individual holds, the more secure the randomness they create is, the more casino profits the user receives.
 
 Assume our casino is profiting:
-- $400k per quarter on bets sized $10 or less 
+
+- $400k per quarter on bets sized $10 or less
+
 - $300k per quarter on bets size greater than $10, but less than $100
+
 - $250k per quarter on bets greater than $100, but less than $1,000
 
 *$1,000 is the maximum bet for our casino in this hypothetical scenario.*
 
 The next quarter, we implement RANDAC, our decentralized randomness generation protocol:
+
 - We have 1000 junior-master nodes staking 1,000 RNG
+
 - We have 200 master nodes staking 10,000 RNG
+
 - We have a final 50 super-master nodes staking 100,000 RNG
 
 A junior-master node participates in all randomness generation rounds where bets are $10 or less. A master node (since it needs 10x as many RNG) counts as 10 junior master nodes. A super-master node (since it needs 50x as many RNG) counts as 50 junior master nodes. This is to prevent users from being incentivized (in some cases) to break up larger nodes, and create multiple smaller nodes. Both master nodes & super-master nodes participate in these randomness generation rounds as well.
@@ -358,27 +368,23 @@ Assume there are 50 randomness contributors in a round. Each randomness contribu
 
 We can reduce this to one transaction, per contributor, per round as follows: Require users to sign up for multiple contribution periods. Users generate random entropy, and create a “hash onion”:
 
-```
-H^r(E) = C
-```
+`H^r(E) = C`
 
-*```H^r``` = a function where the argument is Hashed r times*
-*```E``` = entropy generated*
-*```C``` = initial commitment*
+*`H^r` = a function where the argument is Hashed r times*
+*`E` = entropy generated*
+*`C` = initial commitment*
 
-For the initial commitment, users commit ```C```. On the first reveal phase, they submit ```H^r-1(E)``` as their pre-image. This pre-image is then used as a commitment for the next period. For an arbitrary reveal phase ```n```, given that ```n < r``` the user submits ```H^r-n(E)```, or ```E where n = r```.
+For the initial commitment, users commit `C`. On the first reveal phase, they submit `H^r-1(E)` as their pre-image. This pre-image is then used as a commitment for the next period. For an arbitrary reveal phase `n`, given that `n < r` the user submits `H^r-n(E)`, or `E where n = r`.
 
 With this enhancement to the protocol, we have reduced the amount of transactions per round to the amount of users per round.
 
 For an off-chain protocol, we first network all contributors through some sort of gossip protocol, where each contributor shares him and his peers messages throughout the network. Each round, we randomly elect a “round leader”. The round leader is in charge of collecting signatures from all contributors of the form:
 
-```
-SigP(r, i)
-```
+`SigP(r, i)`
 
-*```SigP``` = a signature by contributors public key, P*
-*```r``` = round number*
-*```i``` = pre-image*
+*`SigP` = a signature by contributors public key, P*
+*`r` = round number*
+*`i` = pre-image*
 
 These signatures are then posted as a transaction to the blockchain, and the pre-images are hashed together as before. Since we require a contributor sign their pre-image, and a round number (used as a nonce) if a user signs the wrong pre-image, it is simple to detect, as before. 
 
